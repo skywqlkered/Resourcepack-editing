@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item List</title>
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+<body>
+    <h1>Item List</h1>
+    <div id="searchContainer">
+        <label for="item-select">Choose an item:</label>
+        <select name="items" id="item-select">
+            <option value="">--Please choose an option--</option>
+            {{itemOptions}}
+        </select>
+    </div>
+    
+    <script>
+        const itemSelect = document.getElementById('item-select');
+        
+        itemSelect.addEventListener('change', function() {
+            const selectedItem = this.value;
+            if (selectedItem) {
+                console.log('Selected item:', selectedItem);
+                // You can perform any further action with the selected item here
+            }
+        });
+    </script>
+</body>
+</html>
