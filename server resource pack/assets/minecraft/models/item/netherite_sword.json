@@ -1,14 +1,20 @@
 {
-  "parent": "minecraft:item/handheld",
-  "textures": {
-    "layer0": "minecraft:item/netherite_sword"
-  },
-  "overrides": [
-    {
-      "predicate": {
-        "custom_model_data": 127969
-      },
-      "model": "minecraft:item/ron_model"
-      }
-  ]
+    "parent": "minecraft:item/handheld",
+    "textures": {
+        "layer0": "minecraft:item/netherite_sword"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "custom_model_data": 127969
+            },
+            "model": "minecraft:item/ron_model"
+        },
+        {
+            "predicate": {
+                "custom_model_data": 127970
+            },
+            "model": "minecraft:item/pink_sword_model"
+        }
+    ]
 }

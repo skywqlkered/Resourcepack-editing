@@ -1,58 +1,74 @@
-from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.uic import loadUi
+from PyQt6 import QtWidgets, QtGui
+from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.uic import loadUi
 import sys
 import os
-from to_json import first, move
-
-selecteditem, itemname, foldername = "", "", ""
+from to_json import first, move_texture, create_model, edit_or_create
 
 class MainWindow(QtWidgets.QDialog):
-    global selecteditem, itemname, foldername
     def __init__(self):
         super(MainWindow, self).__init__()
         loadUi(os.path.join(os.path.dirname(__file__), "gui.ui"), self)
+        
+        # Initialize instance variables
+        self.itemname = ""
+        self.foldername = ""
+        self.selected_item = ""
 
+        # Connect buttons to their respective functions
         self.browse.clicked.connect(self.browsefiles)
         self.browse_folder.clicked.connect(self.browsefolder)
-        #there is a combobox in the gui.ui file, but I don't know how to access it
-        self.add_to_combo()
+        
+        # Connect the combobox selection change event
         self.comboBox.currentIndexChanged.connect(self.print_selected_item)
         
+        # Connect the send button click event
+        self.send_button.clicked.connect(self.send_data)
+        
+        # Add items to the combobox
+        self.add_to_combo()
 
     def browsefiles(self):
-        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', '.', '.png files (*.png)')
-        self.filename.setText(filename[0])
-        print(filename[0])
-        itemname = filename[0]
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', '.', 'PNG files (*.png)')
+        if filename:
+            self.filename.setText(filename)
+            self.itemname = filename
 
-    
     def browsefolder(self):
         foldername = QtWidgets.QFileDialog.getExistingDirectory(self, 'Open Folder', '.')
-        self.packname.setText(foldername)
-        print(foldername)
+        if foldername:
+            self.packname.setText(foldername)
+            self.foldername = foldername
 
     def add_to_combo(self):
-        #open item-list.txt and add everry item to the combobox, seperated with a ; in the file
+        # Open item-list.txt and add every item to the combobox, separated with a ; in the file
         with open(os.path.join(os.path.dirname(__file__), "item-list.txt"), 'r') as file:
             items = file.read().split(';')
             for item in items:
                 self.comboBox.addItem(item)
-    
-    # print the selected item in the combobox
+
+    # Print the selected item in the combobox
     def print_selected_item(self):
-        selecteditem = self.comboBox.currentText()
-        print(first(selecteditem))
+        self.selected_item = self.comboBox.currentText()
+        first(self.selected_item)  # Assuming first() does some processing
 
+    def send_data(self):
+        if self.itemname and self.foldername and self.selected_item:
+            move_texture(self.itemname, self.foldername)
+            create_model(self.itemname, self.foldername)
+            edit_or_create(self.selected_item, self.itemname, self.foldername)
+        else:
+            QtWidgets.QMessageBox.warning(self, "Error", "Please select a file, a folder, and an item.")
 
-app = QApplication(sys.argv)
-mainwindow = MainWindow()
-widget = QtWidgets.QStackedWidget()
-widget.addWidget(mainwindow)
-widget.setWindowTitle('Resourcepack Editing')
-icon = QtGui.QIcon(os.path.join(os.path.dirname(__file__), "pack.png"))
-widget.setWindowIcon(icon)
-widget.setFixedWidth(300)
-widget.setFixedHeight(200)
-widget.show()
-sys.exit(app.exec_())
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    mainwindow = MainWindow()
+    widget = QtWidgets.QStackedWidget()
+    widget.addWidget(mainwindow)
+    widget.setWindowTitle('Resourcepack Editing')
+    icon = QtGui.QIcon(os.path.join(os.path.dirname(__file__), "pack.png"))
+    widget.setWindowIcon(icon)
+    widget.setFixedWidth(310)
+    widget.setFixedHeight(200)
+    widget.show()
+    sys.exit(app.exec())
