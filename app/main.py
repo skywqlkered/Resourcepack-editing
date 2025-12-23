@@ -1,74 +1,88 @@
-from PyQt6 import QtWidgets, QtGui
-from PyQt6.QtWidgets import QApplication, QMainWindow
-from PyQt6.uic import loadUi
-import sys
 import os
-from to_json import first, move_texture, create_model, edit_or_create
+import requests
+import regex as re
 
-class MainWindow(QtWidgets.QDialog):
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        loadUi(os.path.join(os.path.dirname(__file__), "gui.ui"), self)
-        
-        # Initialize instance variables
-        self.itemname = ""
-        self.foldername = ""
-        self.selected_item = ""
+resourcepack = "testresource"
 
-        # Connect buttons to their respective functions
-        self.browse.clicked.connect(self.browsefiles)
-        self.browse_folder.clicked.connect(self.browsefolder)
-        
-        # Connect the combobox selection change event
-        self.comboBox.currentIndexChanged.connect(self.print_selected_item)
-        
-        # Connect the send button click event
-        self.send_button.clicked.connect(self.send_data)
-        
-        # Add items to the combobox
-        self.add_to_combo()
+resourcepackfolder = r"C:\Users\Julian\AppData\Roaming\PrismLauncher\instances\Ethis for Pros 1.21.10\minecraft\resourcepacks" + "\\" + resourcepack
 
-    def browsefiles(self):
-        filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', '.', 'PNG files (*.png)')
-        if filename:
-            self.filename.setText(filename)
-            self.itemname = filename
+class Resourcepack:
+    def __init__(self, name, version):
+        """
+        Initialize the Resourcepack class
+        @param paths: list[str] Textures, Models, Items
+        """
+        self.name: str = name
+        self.version: str = version
+        self.pack_format = self.get_pack_format()[version]
+        self.textures: dict = {}
+        self.models: dict = {}
+        self.items: list = []
+        self.paths: list[str] = [f"{self.name}\\assets\\minecraft\\textures", f"{self.name}\\assets\\minecraft\\models", f"{self.name}\\assets\\minecraft\\items"]
+        self.add_pack(Resourcepack.get_structure({}, resourcepackfolder))
 
-    def browsefolder(self):
-        foldername = QtWidgets.QFileDialog.getExistingDirectory(self, 'Open Folder', '.')
-        if foldername:
-            self.packname.setText(foldername)
-            self.foldername = foldername
+    def add_pack(self, data_struct: dict):
+        try:
+            mc = data_struct["assets"]["minecraft"]
 
-    def add_to_combo(self):
-        # Open item-list.txt and add every item to the combobox, separated with a ; in the file
-        with open(os.path.join(os.path.dirname(__file__), "item-list.txt"), 'r') as file:
-            items = file.read().split(';')
-            for item in items:
-                self.comboBox.addItem(item)
+            # textures
+            for cate, texture in mc.get("textures", {}).items():
+                if cate not in self.textures:
+                    self.textures[cate] = []
+                self.textures[cate] = list(texture.keys())
+            for cate, model in mc.get("models", {}).items():
+                if cate not in self.models:
+                    self.models[cate] = []
+                self.models[cate] = list(model.keys())
+            for item in mc.get("items", {}).keys():
+                self.items.append(item)
+        except Exception as e:
+            return e
 
-    # Print the selected item in the combobox
-    def print_selected_item(self):
-        self.selected_item = self.comboBox.currentText()
-        first(self.selected_item)  # Assuming first() does some processing
+    @staticmethod
+    def get_structure(struc: dict, path: str):
+        # BASE CASE: empty dict → read directory
+        if not struc:
+            for entry in os.listdir(path):
+                full_path = os.path.join(path, entry)
 
-    def send_data(self):
-        if self.itemname and self.foldername and self.selected_item:
-            move_texture(self.itemname, self.foldername)
-            create_model(self.itemname, self.foldername)
-            edit_or_create(self.selected_item, self.itemname, self.foldername)
-        else:
-            QtWidgets.QMessageBox.warning(self, "Error", "Please select a file, a folder, and an item.")
+                if os.path.isdir(full_path):
+                    struc[entry] = {}
+                else:
+                    struc[entry] = ""
+
+        # RECURSE into subfolders
+        for key, val in struc.items():
+            if isinstance(val, dict):
+                sub_path = os.path.join(path, key)
+                Resourcepack.get_structure(val, sub_path)
+        return struc
+
+    def get_pack_format(self):
+        response = requests.get("https://minecraft.wiki/w/Pack_format")
+        raw_resourcepack = response.text.split("<caption>Resource pack formats")[1]
+        format_pattern = r'pack-format">(\d+[.]*\d*)'
+        version_pattern = r'Java Edition (\d\W\d+\W\d+)'
+        resourcepack_formats = {}
+
+        for line in raw_resourcepack.split("\n"):
+            if '<tr id="pack-format' in line:
+                formats_found = re.findall(format_pattern, line)
+                versions_found = re.findall(version_pattern, line)
+
+                if formats_found and versions_found:
+                    pack_format = formats_found[0]
+
+                    for version in versions_found:
+                        resourcepack_formats[version] = pack_format
+        return resourcepack_formats
+
+
+
+    def __str__(self):
+        return f"{self.name} on version {self.version} ({self.pack_format}): \nTextures: \t{self.textures}\nModels: \t{self.models}\nItems: \t{self.items}\n"
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    mainwindow = MainWindow()
-    widget = QtWidgets.QStackedWidget()
-    widget.addWidget(mainwindow)
-    widget.setWindowTitle('Resourcepack Editing')
-    icon = QtGui.QIcon(os.path.join(os.path.dirname(__file__), "pack.png"))
-    widget.setWindowIcon(icon)
-    widget.setFixedWidth(310)
-    widget.setFixedHeight(200)
-    widget.show()
-    sys.exit(app.exec())
+    pack = Resourcepack("pack1", "1.21.10")
+    print(pack)
+

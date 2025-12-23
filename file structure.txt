@@ -1,0 +1,27 @@
+file structure:
+
+folder
+	|- pack.mcmeta
+	|- pack.png
+	|- assets
+		|-------minecraft
+			|-------items -> the downloaded thing from the website below
+			|-------models
+			|       |-------item -> your blockbench model
+			|
+			|-------textures
+				|-------item -> your blockbench texture
+
+
+website: https://misode.github.io/assets/item/
+
+type: range dispatch
+entry +
+	treshold = model id
+	type = model
+	model = item/filename
+	fallback:
+		type = model
+		model = carved pumpkin
+
+bottom right arrow download
