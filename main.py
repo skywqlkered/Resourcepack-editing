@@ -18,7 +18,7 @@ class Resourcepack:
         self.textures: dict = {}
         self.models: dict = {}
         self.items: list = []
-        self.paths: list[str] = [f"{self.name}\\assets\\minecraft\\textures", f"{self.name}\\assets\\minecraft\\models", f"{self.name}\\assets\\minecraft\\items"]
+        self.paths: list[str] = [fr"{self.name}\assets\minecraft\textures", fr"{self.name}\assets\minecraft\models", fr"{self.name}\assets\minecraft\items"]
         self.add_pack(Resourcepack.get_structure({}, resourcepackfolder))
 
     def add_pack(self, data_struct: dict):
