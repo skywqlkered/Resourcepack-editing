@@ -58,7 +58,8 @@ class Resourcepack:
                 Resourcepack.get_structure(val, sub_path)
         return struc
 
-    def get_pack_format(self):
+    @staticmethod
+    def get_pack_format():
         response = requests.get("https://minecraft.wiki/w/Pack_format")
         raw_resourcepack = response.text.split("<caption>Resource pack formats")[1]
         format_pattern = r'pack-format">(\d+[.]*\d*)'
@@ -80,7 +81,7 @@ class Resourcepack:
 
 
     def __str__(self):
-        return f"{self.name} on version {self.version} ({self.pack_format}): \nTextures: \t{self.textures}\nModels: \t{self.models}\nItems: \t{self.items}\n"
+        return f"opened pack from folder: {resourcepackfolder}\n{self.name} on version {self.version} ({self.pack_format}): \nTextures: \t{self.textures}\nModels: \t{self.models}\nItems: \t{self.items}\n"
 
 if __name__ == "__main__":
     pack = Resourcepack("pack1", "1.21.10")
