@@ -1,0 +1,37 @@
+name: Create Archive
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'release.zip'   # prevents infinite workflow loop
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set Git config
+      run: |
+        git config --global user.name zipper
+        git config --global user.email zipper.zipping@zipping.zip
+
+    - name: Remove old archive if exists
+      run: rm -f release.zip
+
+    - name: Create zip from resource pack folder
+      run: |
+        zip -r release.zip pack/ethis_resourcepack
+
+    - name: Commit and push archive
+      run: |
+        git add release.zip
+        git commit -m "Update resource pack archive" || echo "No changes to commit"
+        git push
