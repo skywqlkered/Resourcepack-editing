@@ -1,11 +1,12 @@
 import os
 import requests
 import regex as re
+from fileformatting import *
 
-resourcepack = "testresource"
+resourcepack = "testresource - 1.21.11"
 
-resourcepackfolder = r"C:\Users\Julian\AppData\Roaming\PrismLauncher\instances\Ethis for Pros 1.21.10\minecraft\resourcepacks" + "\\" + resourcepack
-
+resourcepackfolder = r"C:\Users\Julian\AppData\Roaming\.minecraft\resourcepacks" + "\\" + resourcepack
+                
 class Resourcepack:
     def __init__(self, name, version):
         """
@@ -18,8 +19,9 @@ class Resourcepack:
         self.textures: dict = {}
         self.models: dict = {}
         self.items: list = []
-        self.paths: list[str] = [fr"{self.name}\assets\minecraft\textures", fr"{self.name}\assets\minecraft\models", fr"{self.name}\assets\minecraft\items"]
+        self.paths: list[str] = [fr"\\assets\minecraft\textures\\", fr"\\assets\minecraft\models\\", fr"\\assets\minecraft\items\\"]
         self.add_pack(Resourcepack.get_structure({}, resourcepackfolder))
+
 
     def add_pack(self, data_struct: dict):
         try:
@@ -35,7 +37,8 @@ class Resourcepack:
                     self.models[cate] = []
                 self.models[cate] = list(model.keys())
             for item in mc.get("items", {}).keys():
-                self.items.append(item)
+                if item not in self.items:
+                    self.items.append(item)
         except Exception as e:
             return e
 
@@ -78,12 +81,22 @@ class Resourcepack:
                         resourcepack_formats[version] = pack_format
         return resourcepack_formats
 
-
-
     def __str__(self):
         return f"opened pack from folder: {resourcepackfolder}\n{self.name} on version {self.version} ({self.pack_format}): \nTextures: \t{self.textures}\nModels: \t{self.models}\nItems: \t{self.items}\n"
 
+    def add_item(self, mc_item, model_name):
+        path = resourcepackfolder + self.paths[2] # paths[2] = items 
+        if check_item(resourcepackfolder + self.paths[2], mc_item):
+            index = add_model_to_existing_item(path, mc_item, model_name)
+        else: 
+            index = add_model_to_new_item(path, mc_item, model_name)
+        print(f"The custom model index of your item is: {index}")
+        self.add_pack(Resourcepack.get_structure({}, resourcepackfolder))
+
+
+        
 if __name__ == "__main__":
-    pack = Resourcepack("pack1", "1.21.10")
+    pack = Resourcepack("pack1", "1.21.11")
+    pack.add_item("echo_shart", "test_sword_blue")
     print(pack)
 
