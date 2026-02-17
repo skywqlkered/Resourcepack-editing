@@ -1,28 +1,34 @@
 name: Create Archive
-on: [push]
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'release.zip'   # prevents infinite workflow loop
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: pull latest and remove old file from repo
+    - name: Set Git config
       run: |
         git config --global user.name zipper
-        git config --global user.email zipper.zipping@zipper.zip
-        git config pull.rebase false
-        git pull
-        rm -f release.zip
+        git config --global user.email zipper.zipping@zipping.zip
 
-    - name: Archive Only Resource Pack Folder
+    - name: Remove old archive if exists
+      run: rm -f release.zip
+
+    - name: Create zip from resource pack folder
       run: |
-        cd pack/ethis_resourcepack
-        zip -r ../../../release.zip .
+        zip -r release.zip pack/ethis_resourcepack
 
-    - name: push changes to remote
+    - name: Commit and push archive
       run: |
         git add release.zip
-        git commit -m "new pack"
-        git push --force
+        git commit -m "Update resource pack archive" || echo "No changes to commit"
+        git push
