@@ -18,7 +18,7 @@ jobs:
 
     - name: Archive Only Resource Pack Folder
       run: |
-        cd pack/ethis_resourcpack
+        cd pack/ethis_resourcepack
         zip -r ../../../release.zip .
 
     - name: push changes to remote
