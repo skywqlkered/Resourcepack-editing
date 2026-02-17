@@ -1,0 +1,28 @@
+name: Create Archive
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: pull latest and remove old file from repo
+      run: |
+        git config --global user.name zipper
+        git config --global user.email zipper.zipping@zipper.zip
+        git config pull.rebase false
+        git pull
+        rm -f release.zip
+
+    - name: Archive Only Resource Pack Folder
+      run: |
+        cd pack/ethis-resourcpack
+        zip -r ../../../release.zip .
+
+    - name: push changes to remote
+      run: |
+        git add release.zip
+        git commit -m "new pack"
+        git push --force
