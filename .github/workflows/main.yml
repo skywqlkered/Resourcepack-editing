@@ -7,6 +7,9 @@ on:
     paths-ignore:
       - 'release.zip'   # prevents infinite workflow loop
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
