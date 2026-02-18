@@ -32,6 +32,8 @@ jobs:
 
     - name: Commit and push archive
       run: |
-        git add release.zip
-        git commit -m "Update resource pack archive" || echo "No changes to commit"
-        git push
+          git add release.zip
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Update resource pack archive"
+          git pull --rebase origin main
+          git push origin HEAD:main
