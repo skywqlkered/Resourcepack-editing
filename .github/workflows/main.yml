@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - 'release.zip'   # prevents infinite workflow loop
+      - 'release.zip'
 
 permissions:
   contents: write
@@ -16,22 +16,41 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set Git config
       run: |
-        git config --global user.name zipper
-        git config --global user.email zipper.zipping@zipping.zip
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Remove old archive if exists
-      run: rm -f release.zip
-
-    - name: Create zip from resource pack folder
+    - name: Create clean zip
       run: |
-        zip -r release.zip pack/ethis_resourcepack
+        # 1. Delete the old zip if it exists in the repo root
+        rm -f release.zip
+
+        # 2. Enter the folder where the actual pack files are
+        cd pack/ethis_resourcepack
+
+        # 3. Zip everything in the CURRENT folder (.) 
+        # and save the file two levels up (../../) in the repo root
+        zip -r ../../release.zip .
 
     - name: Commit and push archive
       run: |
         git add release.zip
-        git commit -m "Update resource pack archive" || echo "No changes to commit"
-        git push
+        
+        # Only commit if the zip actually changed
+        if git diff --cached --quiet; then
+          echo "No changes to the zip file."
+          exit 0
+        fi
+
+        git commit -m "Update resource pack archive [skip ci]"
+        
+        # Pull changes using 'theirs' strategy to resolve binary conflicts automatically
+        git fetch origin main
+        git rebase -X theirs origin/main
+        
+        git push origin HEAD:main
