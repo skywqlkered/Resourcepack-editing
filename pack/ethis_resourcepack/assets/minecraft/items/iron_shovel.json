@@ -7,7 +7,7 @@
                 "threshold": 1,
                 "model": {
                     "type": "minecraft:model",
-                    "model": "item/duck"
+                    "model": "item/ducko"
                 }
             },
             {
