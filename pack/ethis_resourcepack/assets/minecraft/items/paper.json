@@ -1,0 +1,61 @@
+{
+    "model": {
+        "type": "minecraft:range_dispatch",
+        "property": "minecraft:custom_model_data",
+        "entries": [
+            {
+                "threshold": 1,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting2"
+                }
+            },
+            {
+                "threshold": 2,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting1"
+                }
+            },
+            {
+                "threshold": 3,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting3"
+                }
+            },
+            {
+                "threshold": 4,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting4"
+                }
+            },
+            {
+                "threshold": 5,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting5"
+                }
+            },
+            {
+                "threshold": 6,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting6"
+                }
+            },
+            {
+                "threshold": 7,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting7"
+                }
+            }
+        ],
+        "fallback": {
+            "type": "minecraft:model",
+            "model": "minecraft:item/paper"
+        }
+    }
+}
