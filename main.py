@@ -2,10 +2,11 @@ import os
 import requests
 import regex as re
 from fileformatting import *
+from fileuploading import upload_files
 
 resourcepack = "testresource - 1.21.11"
 
-resourcepackfolder = r"C:\Users\Julian\AppData\Roaming\.minecraft\resourcepacks" + "\\" + resourcepack
+resourcepackfolder = r"pack/ethis_resourcepack"
                 
 class Resourcepack:
     def __init__(self, name, version):
@@ -43,7 +44,7 @@ class Resourcepack:
             return e
 
     @staticmethod
-    def get_structure(struc: dict, path: str):
+    def get_structure(struc: dict, path: str): 
         # BASE CASE: empty dict → read directory
         if not struc:
             for entry in os.listdir(path):
@@ -90,13 +91,21 @@ class Resourcepack:
             index = add_model_to_existing_item(path, mc_item, model_name)
         else: 
             index = add_model_to_new_item(path, mc_item, model_name)
-        print(f"The custom model index of your item is: {index}")
+        print(f"The custom model index of your {model_name} is: {index}")
         self.add_pack(Resourcepack.get_structure({}, resourcepackfolder))
-
+        
+    def add_painting(self, model_name):
+        path = resourcepackfolder + self.paths[1] + "item\\"
+        create_painting_model(path, model_name)
+        self.add_item("paper", model_name)
+        print("Make sure to add your painting texture to assets/minecraft/item/textures/item")
 
         
 if __name__ == "__main__":
     pack = Resourcepack("pack1", "1.21.11")
-    pack.add_item("echo_shart", "test_sword_blue")
+    pack.add_painting("painting7")
     print(pack)
+    from syncpack import sync_repack
+    sync_repack()
+    upload_files()
 
