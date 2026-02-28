@@ -65,6 +65,13 @@
                     "type": "minecraft:model",
                     "model": "item/Xx_Pwaintingxd"
                 }
+            },
+            {
+                "threshold": 10,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/XxPwaintingxd"
+                }
             }
         ],
         "fallback": {
