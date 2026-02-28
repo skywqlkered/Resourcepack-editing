@@ -51,6 +51,13 @@
                     "type": "minecraft:model",
                     "model": "item/painting7"
                 }
+            },
+            {
+                "threshold": 8,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/painting8"
+                }
             }
         ],
         "fallback": {
