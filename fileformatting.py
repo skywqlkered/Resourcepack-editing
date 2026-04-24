@@ -33,8 +33,13 @@ def add_model_to_existing_item(path, mc_item, model_name) -> int: # type: ignore
         
         # creating a new entry
         entry_format = {"threshold": highest_treshhold+1, "model": {"type": "minecraft:model", "model": f"item/{model_name}"}}
-        if str(entry_format["model"]) != [str(entry_str["model"]) for entry_str in entries]:
+        print(str(entry_format["model"]))
+        print( [str(entry_str["model"]) for entry_str in entries])
+        if str(entry_format["model"]) not in [str(entry_str["model"]) for entry_str in entries]:
             entries.append(entry_format)
+            highest_treshhold+=1
+        
+        content["model"]["entries"] = entries
         
         # Writing to json
         content_str = json.dumps(content, indent=4)
@@ -64,6 +69,39 @@ def add_model_to_new_item(path, mc_item, model_name) -> int: # type: ignore
     with open(path + f"{mc_item}.json", mode="w") as f:
         f.write(content_str)
     return 1
+
+def create_painting_model(path, model_name):
+    content = {
+        "format_version": "1.21.11",
+        "credit": "Script written by Skywalkered",
+        "textures": {
+            "0": f"minecraft:item/{model_name}",
+            "particle": f"minecraft:item/{model_name}"
+        },
+        "elements": [
+            {
+                "from": [0, 0, 8],
+                "to": [16, 16, 8],
+                "rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 6]},
+                "faces": {
+                    "north": {"uv": [0, 0, 16, 16], "texture": "#0"},
+                    "south": {"uv": [0, 16, 16, 32], "texture": "#0"}
+                }
+            }
+        ],
+        "display": {
+            "fixed": {
+                "translation": [0, 0, -0.1],
+                "scale": [2, 2, 1]
+            }
+        }
+    }
+    # Writing to json
+    content_str = json.dumps(content, indent=4)
+    with open(path + f"{model_name}.json", mode="w") as f:
+        f.write(content_str)
+
+
 
 def get_mc_items():
     pass

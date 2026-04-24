@@ -95,6 +95,8 @@ class Resourcepack:
         self.add_pack(Resourcepack.get_structure({}, resourcepackfolder))
         
     def add_painting(self, model_name):
+        if model_name != model_name.lower():
+            raise NameError("Model names contain any characters that are not in [a-z0-9/._-]")
         path = resourcepackfolder + self.paths[1] + "item\\"
         create_painting_model(path, model_name)
         self.add_item("paper", model_name)
@@ -103,7 +105,7 @@ class Resourcepack:
         
 if __name__ == "__main__":
     pack = Resourcepack("pack1", "1.21.11")
-    pack.add_painting("painting7")
+    pack.add_painting("painting9")
     print(pack)
     from syncpack import sync_repack
     sync_repack()
