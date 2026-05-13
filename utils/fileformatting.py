@@ -1,6 +1,5 @@
 import os
 import json
-from main import resourcepackfolder
 
 def get_current_items_in_folder(folderpath: str) -> list[str]:
     items = [entry for entry in os.listdir(folderpath)]

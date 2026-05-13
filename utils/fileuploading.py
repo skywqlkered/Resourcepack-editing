@@ -54,7 +54,8 @@ def upload_files():
         repo.index.add(upload_files) #add 
         repo.index.commit("Resourcepack update") # commit
         origin.push()# push
-    else: print("No files were uploaded")
+    else: 
+        print("No files were uploaded")
     
 if __name__ == "__main__":
     upload_files()
