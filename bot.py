@@ -19,7 +19,7 @@ async def on_ready():
         guild=discord.Object(id=925805443887022121)
     )  # ethis
     print(
-        f"We have logged in as {client.user} and synced {len(synced_commands)} commands."
+        f"I have logged in as {client.user} and synced {len(synced_commands)} commands."
     )
 
 
