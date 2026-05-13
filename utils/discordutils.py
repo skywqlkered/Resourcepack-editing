@@ -57,7 +57,7 @@ def decide_action(message: discord.Message)-> tuple[int, str]:
         if file.filename.endswith("json"):
             return 2, ""
         
-    return 0, f"Filetype {file.filename[file.filename.rfind("."):]} not supported." # type: ignore
+    return 0, f"File type {file.filename[file.filename.rfind("."):]} not supported." # type: ignore
     
     
 def verify_owner(message: discord.Message) -> bool:

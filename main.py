@@ -1,8 +1,8 @@
 import os
 import requests
 import regex as re
-from fileformatting import *
-from fileuploading import upload_files
+from utils.fileformatting import *
+from utils.fileuploading import upload_files
 
 resourcepack = "testresource - 1.21.11"
 
