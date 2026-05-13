@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 import git
 from pathlib import Path
-import os, datetime
-from dotenv import load_dotenv
+import os 
+import datetime
 
 def update_env(highest_date: datetime.datetime):
     with open(".env", "r+") as env:
@@ -32,7 +32,9 @@ def upload_files():
     if prev_highest_date:
         datetime_str = datetime.datetime.strptime(prev_highest_date, format)
     else: 
-        raise KeyError("LAST_UPDATE is not set in .env")
+        update_env(datetime.datetime.now())
+        raise KeyError("LAST_UPDATE is not set in .env, set current time as highest.")
+    
     
     upload_files = []
     p = Path(r"pack/ethis_resourcepack")
