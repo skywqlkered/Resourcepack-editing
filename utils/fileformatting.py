@@ -12,14 +12,14 @@ def get_content_of_file(filepath: str) -> dict | None:
         content_str = f.read()
         return json.loads(content_str)
 
-def check_item(path, mc_item):
+def check_item(path, mc_item)->bool:
     if os.path.isfile(path+f"{mc_item}.json"):
         return True
     else:
         return False
 
-def add_model_to_existing_item(path, mc_item, model_name) -> int: # type: ignore
-    content = get_content_of_file(path + f"{mc_item}.json")
+def add_model_to_existing_item(modelpath, mc_item, model_name) -> int: # type: ignore
+    content = get_content_of_file(modelpath + f"{mc_item}.json")
     if content:        
         
         # Adding all item entries to a python list
@@ -32,8 +32,8 @@ def add_model_to_existing_item(path, mc_item, model_name) -> int: # type: ignore
         
         # creating a new entry
         entry_format = {"threshold": highest_treshhold+1, "model": {"type": "minecraft:model", "model": f"item/{model_name}"}}
-        print(str(entry_format["model"]))
-        print( [str(entry_str["model"]) for entry_str in entries])
+        # print(str(entry_format["model"]))
+        # print( [str(entry_str["model"]) for entry_str in entries])
         if str(entry_format["model"]) not in [str(entry_str["model"]) for entry_str in entries]:
             entries.append(entry_format)
             highest_treshhold+=1
@@ -42,11 +42,11 @@ def add_model_to_existing_item(path, mc_item, model_name) -> int: # type: ignore
         
         # Writing to json
         content_str = json.dumps(content, indent=4)
-        with open(path + f"{mc_item}.json", mode="w") as f:
+        with open(modelpath + f"{mc_item}.json", mode="w") as f:
             f.write(content_str)
         return highest_treshhold
 
-def add_model_to_new_item(path, mc_item, model_name) -> int: # type: ignore
+def add_model_to_new_item(modelpath, mc_item, model_name) -> int: # type: ignore
     content = {
     "model": {
         "type": "minecraft:range_dispatch",
@@ -65,7 +65,7 @@ def add_model_to_new_item(path, mc_item, model_name) -> int: # type: ignore
 
     # Writing to json
     content_str = json.dumps(content, indent=4)
-    with open(path + f"{mc_item}.json", mode="w") as f:
+    with open(modelpath + f"{mc_item}.json", mode="w") as f:
         f.write(content_str)
     return 1
 
@@ -102,14 +102,10 @@ def create_painting_model(path, model_name):
 
 
 
-def get_mc_items():
-    pass
+   
 
 # # 1. check if mc_item already exists
 # # 2.    if yes, add new model and return index
 # #       if not, make a new JSON file and return index
 # resourcepack_path = resourcepackfolder
-# item_suffix = r"\\assets\minecraft\items\\"
-# model_item_suffix = r"\\assets\minecraft\models\item\\"
-# model_texture_suffix = r"\\assets\minecraft\textures\item\\"
 

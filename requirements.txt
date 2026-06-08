@@ -2,3 +2,4 @@ GitPython
 audioop-lts
 discord.py
 python-dotenv
+GitPython==0.3.2

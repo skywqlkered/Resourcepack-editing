@@ -1,10 +1,11 @@
 import discord
+from ..discordutils import download_texture, download_model
 
 class ConfirmView(discord.ui.View):
     def __init__(self, action, message):
         super().__init__(timeout=60)
         self.action = action
-        self.message = message
+        self.message:discord.Message = message
         
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -14,16 +15,18 @@ class ConfirmView(discord.ui.View):
         if self.action[0] == 1:
             # You can use interaction.followup to send new messages
             await interaction.response.edit_message(content="Processing texture...", view=None)
-            # Run your texture processing code here
+            await download_texture(message=self.message)
+            await interaction.response.edit_message(content="Processed texture", view=None)
             
         elif self.action[0] == 2:
             await interaction.response.edit_message(content="Processing model...", view=None)
-            # Run your model processing code here
+            await download_model(message=self.message)
+            await interaction.response.edit_message(content="Processed model", view=None)
         
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user != self.message.author:
-            return await interaction.response.send_message("This isn't your upload.", ephemeral=True)
+            return await interaction.response.send_message("This isn't your thread.", ephemeral=True)
         
         await interaction.response.edit_message(content="Upload cancelled.", view=None)
         self.stop()

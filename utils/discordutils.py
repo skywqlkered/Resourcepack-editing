@@ -1,6 +1,8 @@
 import discord
 import json
 import os
+from pathlib import Path
+from fileformatting import check_item, add_model_to_existing_item, add_model_to_new_item, create_painting_model
 
 async def create_thread(author: discord.User, channel: discord.TextChannel, name):
     thread = await channel.create_thread(name=name, message=None)
@@ -60,19 +62,140 @@ def decide_action(message: discord.Message)-> tuple[int, str]:
     return 0, f"File type {file.filename[file.filename.rfind("."):]} not supported." # type: ignore
     
     
-def verify_owner(message: discord.Message) -> bool:
-    owner_id = get_thread_owner(message.channel.id)
-    if message.author.id == owner_id:
+def verify_owner(channel, author: discord.User | discord.Member) -> bool:
+    owner_id = get_thread_owner(channel.id)
+    if author.id == owner_id:
         return True
     else:
         return False 
+
+async def download_texture(message: discord.Message):
+    attachment = message.attachments[0]#type: ignore
+    path = Path("pack/ethis_resourcepack/assets/minecraft/textures/item/" + attachment.filename)
+    update_thread_content(message.channel.id, texture=attachment.filename)
+    await attachment.save(fp=path) 
+    
+async def download_model(message: discord.Message):
+    attachment = message.attachments[0]#type: ignore
+    path = Path("pack/ethis_resourcepack/assets/minecraft/models/item/" + attachment.filename)
+    update_thread_content(message.channel.id, model=attachment.filename)
+    await attachment.save(fp=path) 
+
+def get_thread_content(threadid: int) -> dict | None:
+    with open("threadcontent.json", "r") as file:
+        data = json.load(file)
+
+        for thread in data["threads"]:
+            if list(thread.keys())[0] == str(threadid):
+                return list(thread.values())[0]
+    
+        return None
+
+def update_thread_content(threadid: int, **kwargs):
+    texture = kwargs.get("texture", None)
+    model = kwargs.get("model", None)
+    owner = kwargs.get("owner", None)
+    treshold = kwargs.get("treshold", None)
+    mcitem = kwargs.get("mcitem", None)
+    
+    contents = {"textures": texture, "model": model, "owner":owner, "treshold":treshold, "mcitem": mcitem}
+    
+    entry = get_thread_content(threadid)
+    if entry: # edit
+        for key, val in contents.items():
+            if val and not entry[key] and key != "textures":
+                entry[key] = val 
+            elif key == "textures":
+                if val not in entry["textures"] and val:
+                    entry["textures"].append(val)
+    else: # new
+        entry = {
+        "owner": owner,
+        "textures":[texture],
+        "model": model,
+        "mcitem": mcitem,
+        "threshold": treshold
+        }
+    
+    with open("threadcontent.json", "r") as f:
+        data = json.load(f)
+        
+        for thread in data["threads"]:
+            if list(thread.keys())[0] == str(threadid):
+                old_entry = list(thread.values())[0]
+        try:
+            data["threads"].remove({str(threadid): old_entry}) # type: ignore
+        except ValueError:
+            pass
+        except UnboundLocalError:
+            pass
+        
+    data["threads"].append({threadid: entry})
+
+    with open("threadcontent.json", "w") as f:
+        json_str = json.dumps(data, indent=4)
+        f.write(json_str)
+
+
+def verify_uploads(threadid:int) -> bool | list | None:
+    with open("threadcontent.json", "r") as f:
+        data = json.load(f)
+    
+    entry = None
+    
+    for thread in data["threads"]:
+        if list(thread.keys())[0] == str(threadid):
+            entry = list(thread.values())[0]
+    
+    bools = {}
+    
+    if not entry:
+        return
+    
+    for key, val in entry.items():
+        if key == "textures":
+            if len(val) != 0:
+                bools[key] = True
+            else:
+                bools[key] = False
+        elif key == "threshold":
+            continue
+        else:
+            if val:
+                bools[key] = True
+            else:
+                bools[key] = False
+                
+    if all(list(bools.values())):
+        return True
+    else:
+        false_list = []
+        for key,val in bools.items():
+            if not val:
+                false_list.append(key)
+        return false_list
+
+def create_texture(threadid: int):
+    path = "pack/ethis_resourcepack/assets/minecraft/items/"
     
     
-def download_file(attachment):
-    pass
+    with open("threadcontent.json", "r") as f:
+        data = json.load(f)
+    entry = None
+    for thread in data["threads"]:
+        if list(thread.keys())[0] == str(threadid):
+            entry = list(thread.values())[0]
+    if not entry:
+        return
+    
+    mcitem = entry["mcitem"]
+    modelname = entry["model"].removesuffix(".json")
+    if check_item(path, mcitem):
+        treshold = add_model_to_existing_item(path, mcitem, modelname)
+    else:
+        treshold = add_model_to_new_item(path, mcitem, modelname)
+        
+    return treshold
 
-def move_file(idk): 
-    pass
-
-def setup_model(idk):
-    pass
+def create_painting():
+    create_painting_model()
