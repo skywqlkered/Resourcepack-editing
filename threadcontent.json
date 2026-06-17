@@ -10,6 +10,31 @@
                 "mcitem": "diamond_pickaxe",
                 "threshold": null
             }
+        },
+        {
+            "1516637485676101692": {
+                "owner": "Skywalkered",
+                "textures": [
+                    null,
+                    "krampus2.png"
+                ],
+                "model": "tommy.json",
+                "mcitem": "paper",
+                "threshold": 12,
+                "isPainting": true
+            }
+        },
+        {
+            "1516646501831676037": {
+                "owner": null,
+                "textures": [
+                    null
+                ],
+                "model": "test1.json",
+                "mcitem": "paper",
+                "threshold": null,
+                "isPainting": true
+            }
         }
     ]
 }

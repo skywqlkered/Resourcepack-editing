@@ -1,8 +1,8 @@
 import os
 import requests
 import regex as re
-from utils.fileformatting import add_model_to_existing_item, add_model_to_new_item, check_item, create_painting_model
-from utils.fileuploading import upload_files
+from utils.modelutils import add_model_to_existing_item, add_model_to_new_item, check_item, create_painting_model
+from utils.gitutils import upload_files
 
 resourcepack = "testresource - 1.21.11"
 

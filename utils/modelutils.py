@@ -2,23 +2,58 @@ import os
 import json
 
 def get_current_items_in_folder(folderpath: str) -> list[str]:
+    """Loops throught a path and returns all filenames in a list.
+
+    Args:
+        folderpath (str): the chosen path
+
+    Returns:
+        list[str]: returns all the files in a given folder path
+    """
     items = [entry for entry in os.listdir(folderpath)]
     return items
 
 def get_content_of_file(filepath: str) -> dict | None:
+    """gets the content of a model file
+
+    Args:
+        filepath (str): the path of a model
+
+    Returns:
+        dict | None: either the complete content or None if not found.
+    """
     if not os.path.isfile(filepath):
         return None
     with open(filepath) as f:
         content_str = f.read()
         return json.loads(content_str)
 
-def check_item(path, mc_item)->bool:
+def check_item(path: str, mc_item: str)->bool:
+    """Checks whether there exists a model for a Minecraft item
+
+    Args:
+        path (str): File path to check for item
+        mc_item (str): The minecraft item to be checked
+
+    Returns:
+        bool: True if there is an existing model for a Minecraft item. False otherwise
+    """
     if os.path.isfile(path+f"{mc_item}.json"):
         return True
     else:
         return False
 
-def add_model_to_existing_item(modelpath, mc_item, model_name) -> int: # type: ignore
+def add_model_to_existing_item(modelpath: str, mc_item: str, model_name:str) -> int: # type: ignore
+    """Adds a model to an existing minecraft item and returns the corresponding threshold.
+
+    Args:
+        modelpath (str): The path where the models are stored
+        mc_item (str): The minecraft item to add the model to
+        model_name (str): The model to be added
+
+    Returns:
+        int: The custom model threshold
+    """
     content = get_content_of_file(modelpath + f"{mc_item}.json")
     if content:        
         
@@ -46,7 +81,17 @@ def add_model_to_existing_item(modelpath, mc_item, model_name) -> int: # type: i
             f.write(content_str)
         return highest_treshhold
 
-def add_model_to_new_item(modelpath, mc_item, model_name) -> int: # type: ignore
+def add_model_to_new_item(modelpath: str, mc_item: str, model_name:str) -> int: # type: ignore
+    """Creates a new model of a minecraft item and returns the corresponding threshold.
+
+    Args:
+        modelpath (str): The path where the models are stored
+        mc_item (str): The minecraft item to create the model of
+        model_name (str): The model to be added
+
+    Returns:
+        int: The custom model threshold
+    """
     content = {
     "model": {
         "type": "minecraft:range_dispatch",
@@ -69,9 +114,15 @@ def add_model_to_new_item(modelpath, mc_item, model_name) -> int: # type: ignore
         f.write(content_str)
     return 1
 
-def create_painting_model(path, model_name):
+def create_painting_model(path: str, model_name: str):
+    """Creates a JSON model for a painting and saves it to the path. 
+
+    Args:
+        path (str): The path to save the model to
+        model_name (str): The model's name
+    """
     content = {
-        "format_version": "1.21.11",
+        "format_version": "26.1.2",
         "credit": "Script written by Skywalkered",
         "textures": {
             "0": f"minecraft:item/{model_name}",
@@ -84,7 +135,7 @@ def create_painting_model(path, model_name):
                 "rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 6]},
                 "faces": {
                     "north": {"uv": [0, 0, 16, 16], "texture": "#0"},
-                    "south": {"uv": [0, 16, 16, 32], "texture": "#0"}
+                    "south": {"uv": [0, 0, 16, 16], "texture": "#0"}
                 }
             }
         ],
@@ -99,6 +150,7 @@ def create_painting_model(path, model_name):
     content_str = json.dumps(content, indent=4)
     with open(path + f"{model_name}.json", mode="w") as f:
         f.write(content_str)
+
 
 
 

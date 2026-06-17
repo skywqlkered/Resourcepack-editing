@@ -1,5 +1,5 @@
 import discord
-from ..discordutils import download_texture, download_model
+from ..threadutils import download_texture, download_model
 
 class ConfirmView(discord.ui.View):
     def __init__(self, action, message):
@@ -13,10 +13,13 @@ class ConfirmView(discord.ui.View):
             return await interaction.response.send_message("This isn't your upload.", ephemeral=True)
         
         if self.action[0] == 1:
-            # You can use interaction.followup to send new messages
-            await interaction.response.edit_message(content="Processing texture...", view=None)
-            await download_texture(message=self.message)
-            await interaction.response.edit_message(content="Processed texture", view=None)
+            try:
+                # You can use interaction.followup to send new messages
+                await interaction.response.edit_message(content="Processing texture...", view=None)
+                await download_texture(message=self.message)
+                await interaction.response.edit_message(content="Processed texture", view=None)
+            except discord.errors.InteractionResponded:
+                pass
             
         elif self.action[0] == 2:
             await interaction.response.edit_message(content="Processing model...", view=None)
