@@ -48,6 +48,19 @@
                 "threshold": 13,
                 "isPainting": true
             }
+        },
+        {
+            "1518246724060315778": {
+                "owner": "Skywalkered",
+                "textures": [
+                    null,
+                    "painting4.png"
+                ],
+                "model": "painting4.json",
+                "mcitem": "paper",
+                "threshold": 1,
+                "isPainting": true
+            }
         }
     ]
 }
