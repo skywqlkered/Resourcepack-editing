@@ -35,6 +35,19 @@
                 "threshold": null,
                 "isPainting": true
             }
+        },
+        {
+            "1518224001670058077": {
+                "owner": "Skywalkered",
+                "textures": [
+                    null,
+                    "4a5b76e7170df685ed8b75c7dacce268.png"
+                ],
+                "model": "minecraft.json",
+                "mcitem": "paper",
+                "threshold": 13,
+                "isPainting": true
+            }
         }
     ]
 }
