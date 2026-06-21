@@ -19,28 +19,32 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
     - name: Set Git config
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
     - name: Create clean zip
       run: |
-        rm -f release-*.zip
+        rm -f release.zip
         cd pack/ethis_resourcepack
-        zip -r "../../release-$(date -u +"%Y%m%d_%H%M%S").zip" .
+        zip -r ../../release.zip .
     - name: Commit and push archive
       run: |
-        git add release-*.zip
-
+        git add release.zip
+        
         if git diff --cached --quiet; then
           echo "No changes to the zip file."
           exit 0
         fi
         git commit -m "Update resource pack archive [skip ci]"
-
+        
         git fetch origin main
         git rebase -X theirs origin/main
-
+        
         git push origin HEAD:main
+    - name: Reload server resource pack
+      run: |
+        curl -X POST "https://mc.bloom.host/api/client/servers/645aee1d/command" \
+          -H "Authorization: Bearer ${{ secrets.BLOOM_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"command": "pack reload"}'
