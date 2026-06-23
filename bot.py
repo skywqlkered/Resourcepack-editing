@@ -5,6 +5,7 @@ import os
 from utils.threadutils import *  # noqa: F403
 from utils.classes.confirmview import ConfirmView
 from utils.mcitems import mc_items
+from utils.gitutils import upload_files
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -13,17 +14,20 @@ path_str = os.getenv("PATH")
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
-texture_id = 1498357668346069012
-post_channel_id = 1498358237932556479
+texture_cat_id =1498357668346069012 #ethis: 1498357668346069012 # bts3 1518943883252338708
+post_channel_id =1498358237932556479#ethis: 1498358237932556479 # bts3 1518944668971302952 
 
 max_model_uploads_per_week = 2
 
 
 @client.event
 async def on_ready():
-    tree.copy_global_to(guild=discord.Object(id=925805443887022121))
+    ethis_id = 925805443887022121
+    test3_id = 987779478413525023
+    current_id = ethis_id
+    tree.copy_global_to(guild=discord.Object(id=current_id))
     synced_commands = await tree.sync(
-        guild=discord.Object(id=925805443887022121)
+        guild=discord.Object(id=current_id)
     )  # ethis
     print(
         f"I have logged in as {client.user} and synced {len(synced_commands)} commands."
@@ -41,7 +45,7 @@ async def on_message(message: discord.Message):
         return
     if isinstance(message.channel, discord.Thread):
         thread: discord.Thread = message.channel
-        if thread.parent.category_id == texture_id and verify_owner(channel=message.channel, author=message.author) and message.attachments:  # type: ignore # noqa: F405
+        if thread.parent.category_id == texture_cat_id and verify_owner(channel=message.channel, author=message.author) and message.attachments:  # type: ignore # noqa: F405
             action = decide_action(message)  # noqa F405
 
             if action[0] == 0:  # error
@@ -72,7 +76,7 @@ async def texture(interaction: discord.Interaction, name: str):
             "You somehow used this command in something that is not a channel, ask sky",
             ephemeral=False,
         )
-    if channel.category_id != texture_id and not isinstance(channel, discord.Thread):  # type: ignore
+    if channel.category_id != texture_cat_id and not isinstance(channel, discord.Thread):  # type: ignore
         await interaction.response.send_message(
             "This command can only be used in the texture channel.", ephemeral=True
         )
@@ -107,7 +111,7 @@ async def painting(interaction: discord.Interaction, name: str):
             "You somehow used this command in something that is not a channel, ask sky",
             ephemeral=False,
         )
-    if channel.category_id != texture_id and not isinstance(channel, discord.Thread):  # type: ignore
+    if channel.category_id != texture_cat_id and not isinstance(channel, discord.Thread):  # type: ignore
         await interaction.response.send_message(
             "This command can only be used in the texture channel.", ephemeral=True
         )
@@ -169,6 +173,9 @@ async def complete_texture(interaction: discord.Interaction):
         await interaction.response.send_message(
             f"Your model is using CustomModelData: {treshold}"
         )
+        upload_files()
+        
+        
         await close_thread(
             thread=interaction.channel, post_channel_id=post_channel_id
         )  # noqa: F405

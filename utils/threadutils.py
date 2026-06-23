@@ -15,7 +15,7 @@ async def create_thread(author: discord.User, channel: discord.TextChannel, name
     thread = await channel.create_thread(name=name, message=None)
     if not thread:
         return
-    await thread.send(content=f"{author.mention} please follow the instructions below.")
+    await thread.send(content=f"{author.mention} please follow the instructions in <#1518953357941932183>.")
     save_thread_owner(thread, author)
     return thread
 

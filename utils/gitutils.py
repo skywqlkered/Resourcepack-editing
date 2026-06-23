@@ -14,7 +14,7 @@ def update_env(highest_date: datetime.datetime):
     with open(".env", "r+") as env:
         lines = [line for line in env if not line.strip().startswith("LAST_UPDATE")]
         env.seek(0)
-        lines.append(f'LAST_UPDATE = "{str(highest_date)}"')
+        lines.append(f'\nLAST_UPDATE = "{str(highest_date)}"')
         env.writelines(lines)
         env.truncate()
 
