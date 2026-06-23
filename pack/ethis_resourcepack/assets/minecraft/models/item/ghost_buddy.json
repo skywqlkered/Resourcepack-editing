@@ -2,8 +2,8 @@
 	"credit": "Made by Startastic",
 	"parent": "carved_pumpkin",
 	"textures": {
-		"0": "./ghost_buddy",
-		"particle": "./ghost_buddy"
+		"0": "item/ghost_buddy",
+		"particle": "item/ghost_buddy"
 	},
 	"elements": [
 		{
