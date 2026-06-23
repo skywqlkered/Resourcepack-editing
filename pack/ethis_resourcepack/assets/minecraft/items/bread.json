@@ -7,7 +7,7 @@
                 "threshold": 1,
                 "model": {
                     "type": "minecraft:model",
-                    "model": "item/bread"
+                    "model": "item/baguette"
                 }
             }
         ],
