@@ -2,8 +2,8 @@
 	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/dirt_texture",
-		"particle": "block/dirt_texture"
+		"0": "item/dirt_texture",
+		"particle": "item/dirt_texture"
 	},
 	"elements": [
 		{
