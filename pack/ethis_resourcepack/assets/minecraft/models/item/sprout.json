@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/sprout",
-		"particle": "block/sprout"
+		"0": "item/sprout",
+		"particle": "item/sprout"
 	},
 	"elements": [
 		{
