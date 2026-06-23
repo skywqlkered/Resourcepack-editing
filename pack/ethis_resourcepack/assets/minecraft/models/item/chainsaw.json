@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "item/cyberpack_textures/chainsawtx",
-		"particle": "item/cyberpack_textures/chainsawtx"
+		"0": "item/chainsawtx",
+		"particle": "item/chainsawtx"
 	},
 	"elements": [
 		{
