@@ -2,9 +2,9 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [4, 4],
 	"textures": {
-		"0": "minecraft:item/stick_base",
-		"1": "minecraft:item/bottom_twig",
-		"particle": "minecraft:item/stick_base"
+		"0": "item/stick_base",
+		"1": "item/bottom_twig",
+		"particle": "item/stick_base"
 	},
 	"elements": [
 		{
