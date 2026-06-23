@@ -7,20 +7,13 @@
                 "threshold": 1,
                 "model": {
                     "type": "minecraft:model",
-                    "model": "minecraft:item/painting4"
-                }
-            },
-            {
-                "threshold": 2,
-                "model": {
-                    "type": "minecraft:model",
-                    "model": "minecraft:item/catt21"
+                    "model": "item/cane"
                 }
             }
         ],
         "fallback": {
             "type": "minecraft:model",
-            "model": "minecraft:item/paper"
+            "model": "minecraft:item/diamond_sword"
         }
     }
 }
