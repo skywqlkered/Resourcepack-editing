@@ -9,6 +9,13 @@
                     "type": "minecraft:model",
                     "model": "item/cane"
                 }
+            },
+            {
+                "threshold": 2,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "item/grishalibur"
+                }
             }
         ],
         "fallback": {
