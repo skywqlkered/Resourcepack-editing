@@ -2,8 +2,8 @@
 	"credit": "Designed by Zorigami - www.planetminecraft.com/member/zorigami/",
 	"texture_size": [32, 32],
 	"textures": {
-		"3": "./grishalibur",
-		"particle": "iron_scimitar"
+		"3": "item/grishalibur",
+		"particle": "item/iron_scimitar"
 	},
 	"elements": [
 		{
