@@ -1,6 +1,23 @@
 import os
 import json
 
+def create_textures_folder(thread_name: str):
+    """_summary_
+
+    Args:
+        thread_name (str): the name of the model thread
+
+    Returns:
+        str: The path of the created folder
+    """
+    models_folder = "pack/ethis_resourcepack/assets/minecraft/textures/item/"
+    path = models_folder + thread_name
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        pass
+    return path
+
 def get_current_items_in_folder(folderpath: str) -> list[str]:
     """Loops throught a path and returns all filenames in a list.
 
@@ -27,6 +44,28 @@ def get_content_of_file(filepath: str) -> dict | None:
     with open(filepath) as f:
         content_str = f.read()
         return json.loads(content_str)
+
+def edit_model_paths(thread_name:str, filepath: str):
+    """_summary_
+
+    Args:
+        folder_name (str): The folder where the textures exist
+        filepath (str): The path to the json model file
+    """
+    content = get_content_of_file(filepath)
+    if not content:
+        return
+    
+    for key, value in content["textures"].items():
+        texture_name = value.split("/")[-1]        
+        new_path = f"item/{thread_name}/" + texture_name
+        content["textures"][key] = new_path
+
+    content_str = json.dumps(content, indent=4)
+    with open(filepath, mode="w") as f:
+        f.write(content_str)
+        
+    
 
 def check_item(path: str, mc_item: str)->bool:
     """Checks whether there exists a model for a Minecraft item
@@ -161,3 +200,6 @@ def create_painting_model(path: str, model_name: str):
 # #       if not, make a new JSON file and return index
 # resourcepack_path = resourcepackfolder
 
+create_textures_folder(thread_name="grishalibur")
+model_path = "C:/Users/Julian/AppData/Roaming/PrismLauncher/instances/Ethis Extra's 26.1.2 Client/minecraft/resourcepacks/ethis_resourcepack/assets/minecraft/models/item/grishalibur.json"
+edit_model_paths(filepath=model_path, thread_name="grishalibur")

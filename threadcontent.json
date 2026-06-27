@@ -202,7 +202,8 @@
                 "model": "ghost_buddy.json",
                 "mcitem": "diamond_helmet",
                 "threshold": 2,
-                "isPainting": false
+                "isPainting": false,
+                "thread_name": "ghostbud"
             }
         },
         {
@@ -215,6 +216,23 @@
                 "mcitem": null,
                 "threshold": null,
                 "isPainting": false
+            }
+        },
+        {
+            "1520229395623575622": {
+                "thread_name": "musicdisctest2",
+                "textures": [
+                    null,
+                    "image.png"
+                ],
+                "model": "allium.json",
+                "owner": null,
+                "threshold": null,
+                "mcitem": "diamond_pickaxe",
+                "isPainting": false,
+                "animation": null,
+                "message_id": null,
+                "isDeleted": true
             }
         }
     ]

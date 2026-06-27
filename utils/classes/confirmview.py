@@ -1,5 +1,5 @@
 import discord
-from ..threadutils import download_texture, download_model
+from ..threadutils import download_texture, download_model, download_animation
 
 class ConfirmView(discord.ui.View):
     def __init__(self, action, message):
@@ -15,16 +15,18 @@ class ConfirmView(discord.ui.View):
         if self.action[0] == 1:
             try:
                 # You can use interaction.followup to send new messages
-                await interaction.response.edit_message(content="Processing texture...", view=None)
                 await download_texture(message=self.message)
                 await interaction.response.edit_message(content="Processed texture", view=None)
             except discord.errors.InteractionResponded:
                 pass
             
         elif self.action[0] == 2:
-            await interaction.response.edit_message(content="Processing model...", view=None)
             await download_model(message=self.message)
             await interaction.response.edit_message(content="Processed model", view=None)
+            
+        elif self.action[0] == 3:
+            await download_animation(message=self.message)
+            await interaction.response.edit_message(content="Processed animation", view=None)
         
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):

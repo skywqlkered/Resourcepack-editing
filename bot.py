@@ -6,6 +6,7 @@ from utils.threadutils import *  # noqa: F403
 from utils.classes.confirmview import ConfirmView
 from utils.mcitems import mc_items
 from utils.gitutils import upload_files
+from utils.modelutils import create_textures_folder
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -14,8 +15,12 @@ path_str = os.getenv("PATH")
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
-texture_cat_id =1498357668346069012 #ethis: 1498357668346069012 # bts3 1518943883252338708
-post_channel_id =1498358237932556479#ethis: 1498358237932556479 # bts3 1518944668971302952 
+texture_cat_id = (
+    1498357668346069012  # ethis: 1498357668346069012 # bts3 1518943883252338708
+)
+post_channel_id = (
+    1498358237932556479  # ethis: 1498358237932556479 # bts3 1518944668971302952
+)
 
 max_model_uploads_per_week = 2
 
@@ -26,9 +31,7 @@ async def on_ready():
     test3_id = 987779478413525023
     current_id = ethis_id
     tree.copy_global_to(guild=discord.Object(id=current_id))
-    synced_commands = await tree.sync(
-        guild=discord.Object(id=current_id)
-    )  # ethis
+    synced_commands = await tree.sync(guild=discord.Object(id=current_id))  # ethis
     print(
         f"I have logged in as {client.user} and synced {len(synced_commands)} commands."
     )
@@ -81,9 +84,9 @@ async def texture(interaction: discord.Interaction, name: str):
             "This command can only be used in the texture channel.", ephemeral=True
         )
         return
-    if not isAllowedToUpload(
+    if not isAllowedToUpload(  # noqa: F405
         interaction, max_upload_count=max_model_uploads_per_week
-    ):  # noqa: F405
+    ):
         await interaction.response.send_message(
             "You have reached your weekly upload limit, comeback next week or subscribe to Ethis+.",
             ephemeral=True,
@@ -91,7 +94,10 @@ async def texture(interaction: discord.Interaction, name: str):
         return
 
     thread: discord.Thread = await create_thread(interaction.user, channel, name)  # type: ignore  # noqa: F405
-    update_thread_content(threadid=thread.id, isPainting=False)  # noqa: F405
+    update_thread_content(
+        threadid=thread.id, isPainting=False, thread_name=thread.name
+    )  # noqa: F405
+    create_textures_folder(thread_name=thread.name)
     if not thread:
         await interaction.response.send_message(
             "Somehow a thread wasn't created, ask sky", ephemeral=False
@@ -131,7 +137,11 @@ async def painting(interaction: discord.Interaction, name: str):
             ephemeral=False,
         )
     update_thread_content(
-        threadid=thread.id, isPainting=True, mcitem="paper", model=thread.name + ".json"
+        threadid=thread.id,
+        isPainting=True,
+        mcitem="paper",
+        model=thread.name + ".json",
+        thread_name="paintings",
     )  # noqa: F405
 
     if not thread:
@@ -174,8 +184,7 @@ async def complete_texture(interaction: discord.Interaction):
             f"Your model is using CustomModelData: {treshold}"
         )
         upload_files()
-        
-        
+
         await close_thread(
             thread=interaction.channel, post_channel_id=post_channel_id
         )  # noqa: F405
@@ -189,6 +198,18 @@ async def complete_texture(interaction: discord.Interaction):
         await interaction.response.send_message(
             "Something went very wrong, ask sky", ephemeral=False
         )
+
+
+@tree.command(name="delete-thread", description="Completes the model creation")
+@app_commands.default_permissions(administrator=True)
+async def delete_discord_thread(interaction: discord.Interaction):
+    if isinstance(interaction.channel, discord.Thread):
+        message_id = await delete_thread(thread=interaction.channel)
+        assert isinstance(message_id, int)
+        texture_post_channel: discord.TextChannel = interaction.guild.fetch_channel(post_channel_id)  # type: ignore
+        del_message: discord.Message = texture_post_channel.fetch_message(message_id) # type:ignore
+        await del_message.delete()
+    return
 
 
 @select_item.autocomplete("mcitem")
