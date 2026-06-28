@@ -1,5 +1,9 @@
 import os
 import json
+base_dir = os.path.dirname(os.path.abspath(__file__))  # resolves to .../utils/
+
+
+minecraft_pack_path  = os.path.join(base_dir, "..", "pack/ethis_resourcepack/assets/minecraft/")
 
 def create_textures_folder(thread_name: str):
     """_summary_
@@ -10,7 +14,7 @@ def create_textures_folder(thread_name: str):
     Returns:
         str: The path of the created folder
     """
-    models_folder = "pack/ethis_resourcepack/assets/minecraft/textures/item/"
+    models_folder = minecraft_pack_path + "textures/item/"
     path = models_folder + thread_name
     try:
         os.mkdir(path)
@@ -199,7 +203,3 @@ def create_painting_model(path: str, model_name: str):
 # # 2.    if yes, add new model and return index
 # #       if not, make a new JSON file and return index
 # resourcepack_path = resourcepackfolder
-
-create_textures_folder(thread_name="grishalibur")
-model_path = "C:/Users/Julian/AppData/Roaming/PrismLauncher/instances/Ethis Extra's 26.1.2 Client/minecraft/resourcepacks/ethis_resourcepack/assets/minecraft/models/item/grishalibur.json"
-edit_model_paths(filepath=model_path, thread_name="grishalibur")

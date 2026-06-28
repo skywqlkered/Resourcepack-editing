@@ -14,6 +14,12 @@ import regex as re
 import datetime
 import shutil
 
+base_dir = os.path.dirname(os.path.abspath(__file__))  # resolves to .../utils/
+
+thread_content_path = os.path.join(base_dir, "..", "threadcontent.json")
+thread_owners_path  = os.path.join(base_dir, "..", "threadowners.json")
+minecraft_pack_path  = os.path.join(base_dir, "..", "pack/ethis_resourcepack/assets/minecraft/")
+
 
 async def create_thread(author: discord.User, channel: discord.TextChannel, name):
     thread = await channel.create_thread(name=name, message=None)
@@ -56,26 +62,23 @@ async def delete_thread(thread: discord.Thread):
     if not entry:
         return
 
-    pack_path = "pack/ethis_resourcepack/assets/minecraft/"
-
-    # Delete texture folder
-    thread_name = entry["thread_name"]
-    try: 
-        shutil.rmtree(pack_path + "textures/item/" + thread_name)
-    except FileNotFoundError:
-        pass
-    
-    # Delete model
-    model_name = entry["model"]
-    try: 
-        os.remove(pack_path + "models/item/" + model_name)
-    except FileNotFoundError:
-        pass
-
-    # delete thread
-    await thread.delete()
-    update_thread_content(threadid=thread.id, isDeleted=True)
-
+    try:
+        # Delete texture folder
+        thread_name = entry["thread_name"]
+        shutil.rmtree(minecraft_pack_path + "textures/item/" + thread_name)
+    except Exception as eerror:
+        print("Delete texture folder " + str(eerror))
+    try:
+        model_name = entry["model"]
+        os.remove(minecraft_pack_path + "models/item/" + model_name)
+    except Exception as eerror:
+        print("Delete model  " + str(eerror))
+    try:
+        # delete thread
+        await thread.delete()
+        update_thread_content(threadid=thread.id, isDeleted=True)
+    except Exception as eerror:
+        print("Delete thread " + str(eerror))
 
     # return message id for deletion
     return entry["message_id"]
@@ -89,8 +92,8 @@ def get_thread_owner(thread_id) -> int:
     Returns:
         int: owner_id or 0 if not found
     """
-    if os.path.exists("threadowners.json"):
-        with open("threadowners.json", "r") as f:
+    if os.path.exists(thread_owners_path):
+        with open(thread_owners_path, "r") as f:
             thread_owners = json.load(f)
         try:
             owner_id = thread_owners[str(thread_id)]["author"]
@@ -101,8 +104,8 @@ def get_thread_owner(thread_id) -> int:
 
 
 def save_thread_owner(thread, author):
-    if os.path.exists("threadowners.json"):
-        with open("threadowners.json", "r") as f:
+    if os.path.exists(thread_owners_path):
+        with open(thread_owners_path, "r") as f:
             thread_owners = json.load(f)
     else:
         thread_owners = {}
@@ -111,16 +114,16 @@ def save_thread_owner(thread, author):
         "author": author.id,
         "date": datetime.datetime.now().isocalendar().week,
     }
-    with open("threadowners.json", "w") as f:
+    with open(thread_owners_path, "w") as f:
         json.dump(thread_owners, f, indent=2)
 
 def delete_thread_owner(thread):
 
-    with open("threadowners.json", "r") as f:
+    with open(thread_owners_path, "r") as f:
         thread_owners:dict = json.load(f)
 
     thread_owners.pop(str(thread.id))
-    with open("threadowners.json", "w") as f:
+    with open(thread_owners_path, "w") as f:
         json.dump(thread_owners, f, indent=2)
 
 def decide_action(message: discord.Message) -> tuple[int, str]:
@@ -182,7 +185,7 @@ async def download_texture(message: discord.Message):
 
     if isPainting and modelname:
         path = Path(
-            "pack/ethis_resourcepack/assets/minecraft/textures/item/"
+            minecraft_pack_path + "/textures/item/"
             + thread_name
             + "/"
             + modelname.removesuffix(".json")
@@ -190,7 +193,7 @@ async def download_texture(message: discord.Message):
         )
     else:
         path = Path(
-            "pack/ethis_resourcepack/assets/minecraft/textures/item/"
+            minecraft_pack_path + "textures/item/"
             + thread_name
             + "/"
             + attachment.filename
@@ -202,7 +205,7 @@ async def download_texture(message: discord.Message):
 async def download_model(message: discord.Message):
     attachment = message.attachments[0]  # type: ignore
     path = Path(
-        "pack/ethis_resourcepack/assets/minecraft/models/item/" + attachment.filename
+        minecraft_pack_path + "models/item/" + attachment.filename
     )
     update_thread_content(message.channel.id, model=attachment.filename)
     
@@ -211,13 +214,13 @@ async def download_model(message: discord.Message):
         return
     
     await attachment.save(fp=path)
-    edit_model_paths(thread_name=entry["thread_name"], filepath="pack/ethis_resourcepack/assets/minecraft/models/item/" + attachment.filename)
+    edit_model_paths(thread_name=entry["thread_name"], filepath= minecraft_pack_path + "models/item/" + attachment.filename)
 
 
 async def download_animation(message: discord.Message):
     attachment = message.attachments[0]  # type: ignore
     path = Path(
-        "pack/ethis_resourcepack/assets/minecraft/textures/item/" + attachment.filename
+        minecraft_pack_path + "textures/item/" + attachment.filename
     )
     update_thread_content(message.channel.id, animation=attachment.filename)
     await attachment.save(fp=path)
@@ -242,7 +245,7 @@ def get_entry(threadid: int) -> dict | None:
         "message_id",
         "isDeleted"
     """
-    with open("threadcontent.json", "r") as file:
+    with open(thread_content_path, "r") as file:
         data = json.load(file)
 
         for thread in data["threads"]:
@@ -289,7 +292,7 @@ def update_thread_content(threadid: int, **kwargs):
         contents["textures"] = [texture]
         entry = contents
 
-    with open("threadcontent.json", "r") as f:
+    with open(thread_content_path, "r") as f:
         data = json.load(f)
 
         for thread in data["threads"]:
@@ -304,7 +307,7 @@ def update_thread_content(threadid: int, **kwargs):
 
     data["threads"].append({threadid: entry})
 
-    with open("threadcontent.json", "w") as f:
+    with open(thread_content_path, "w") as f:
         json_str = json.dumps(data, indent=4)
         f.write(json_str)
 
@@ -345,8 +348,8 @@ def verify_uploads(threadid: int) -> bool | list | None:
 
 
 def create_texture(threadid: int):
-    items_path = "pack/ethis_resourcepack/assets/minecraft/items/"
-    model_path = "pack/ethis_resourcepack/assets/minecraft/models/item/"
+    items_path = minecraft_pack_path + "items/"
+    model_path =  minecraft_pack_path + "models/item/"
     entry = get_entry(threadid=threadid)
     if not entry:
         return
@@ -382,8 +385,8 @@ def handle_model_name(modelname: str):
 def check_recent_useruploads(author_id):
     weeknumber = datetime.datetime.now().isocalendar().week
     week_counter = 0
-    if os.path.exists("threadowners.json"):
-        with open("threadowners.json", "r") as f:
+    if os.path.exists(thread_owners_path):
+        with open(thread_owners_path, "r") as f:
             thread_owners: dict = json.load(f)
         for value in list(thread_owners.values()):
             if value["author"] == author_id and value["date"] == weeknumber:

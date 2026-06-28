@@ -2,6 +2,9 @@ from dotenv import load_dotenv
 import discord
 from discord import app_commands
 import os
+import asyncio
+import traceback
+
 from utils.threadutils import *  # noqa: F403
 from utils.classes.confirmview import ConfirmView
 from utils.mcitems import mc_items
@@ -9,8 +12,9 @@ from utils.gitutils import upload_files
 from utils.modelutils import create_textures_folder
 
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("TEXTURE_TOKEN")
 path_str = os.getenv("PATH")
+
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -24,6 +28,14 @@ post_channel_id = (
 
 max_model_uploads_per_week = 2
 
+
+async def run_upload():
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_in_executor(None, upload_files)  # no await - fire and forget
+    except Exception as e:
+        print(f"upload_files failed: {e}")
+        traceback.print_exc()
 
 @client.event
 async def on_ready():
@@ -171,7 +183,9 @@ async def select_item(interaction: discord.Interaction, mcitem: str):
 
 @tree.command(name="complete-texture", description="Completes the model creation")
 async def complete_texture(interaction: discord.Interaction):
-    await verify_thread(interaction=interaction)  # noqa: F405
+    if not await verify_thread(interaction=interaction):
+        await interaction.response.send_message("This isn't your thread.", ephemeral=True)
+
     assert isinstance(interaction.channel, discord.Thread)
 
     update_thread_content(  # noqa: F405
@@ -183,8 +197,9 @@ async def complete_texture(interaction: discord.Interaction):
         await interaction.response.send_message(
             f"Your model is using CustomModelData: {treshold}"
         )
-        upload_files()
-
+        await run_upload()
+        
+        
         await close_thread(
             thread=interaction.channel, post_channel_id=post_channel_id
         )  # noqa: F405
@@ -205,11 +220,15 @@ async def complete_texture(interaction: discord.Interaction):
 async def delete_discord_thread(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.Thread):
         message_id = await delete_thread(thread=interaction.channel)
-        assert isinstance(message_id, int)
+        if not message_id:
+            return
         texture_post_channel: discord.TextChannel = interaction.guild.fetch_channel(post_channel_id)  # type: ignore
-        del_message: discord.Message = texture_post_channel.fetch_message(message_id) # type:ignore
+        del_message: discord.Message = texture_post_channel.fetch_message(message_id)  # type: ignore
         await del_message.delete()
-    return
+    else:
+        await interaction.response.send_message(
+            "This is not a texture thread."
+        )
 
 
 @select_item.autocomplete("mcitem")

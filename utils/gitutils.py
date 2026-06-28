@@ -3,7 +3,11 @@ import git
 from pathlib import Path
 import os
 import datetime
-
+import subprocess
+base_dir = os.path.dirname(os.path.abspath(__file__))  # resolves to .../utils/
+minecraft_pack_path  = os.path.join(base_dir, "..", "pack/ethis_resourcepack")
+git_path = os.path.join(base_dir, "..", )
+env_path = os.path.join(base_dir, "..", "..", ".env")  # utils/ -> Resourcepack-editing/ -> home/container/
 
 def update_env(highest_date: datetime.datetime):
     """Updates the .env file with a new highest date
@@ -11,7 +15,7 @@ def update_env(highest_date: datetime.datetime):
     Args:
         highest_date (datetime.datetime): The new date to be added
     """
-    with open(".env", "r+") as env:
+    with open(env_path, "r+") as env:
         lines = [line for line in env if not line.strip().startswith("LAST_UPDATE")]
         env.seek(0)
         lines.append(f'\nLAST_UPDATE = "{str(highest_date)}"')
@@ -44,10 +48,17 @@ def upload_files():
     Raises:
         KeyError: raises when LAST_UPDATE is not defined in the env 
     """
-    repo = git.Repo("../resourcepack-editing")  # initialize
-    origin = repo.remote(name="origin")  # set remote
-    origin.pull()  # pull
-    load_dotenv()
+    load_dotenv(env_path)
+    print("loaded env")
+    github_token = os.getenv("GITHUB_TOKEN")
+    github_repo = os.getenv("GITHUB_REPO")  # e.g. "skywqlkered/Resourcepack-editing"
+    print("tokens loaded")
+    repo = git.Repo(git_path)
+    remote_url = f"https://x-access-token:{github_token}@github.com/{github_repo}.git"
+    origin = repo.remote(name="origin")
+    origin.set_url(remote_url)
+    origin.pull()
+    print("pulled origin")
     prev_highest_date = os.getenv("LAST_UPDATE")
     format = "%Y-%m-%d %H:%M:%S.%f"
     if prev_highest_date:
@@ -56,8 +67,8 @@ def upload_files():
         update_env(datetime.datetime.now())
         raise KeyError("LAST_UPDATE is not set in .env, set current time as highest.")
 
-    upload_files = []
-    p = Path(r"pack/ethis_resourcepack")
+    uploaded_files = []
+    p = Path(minecraft_pack_path)
     files_dict = {}
     for f in p.rglob("*"):
         if f.is_file():
@@ -66,16 +77,25 @@ def upload_files():
             datestamp = datetime.datetime.fromtimestamp(timestamp)
             files_dict[file] = datestamp
             if datestamp > datetime_str:
-                upload_files.append(file)
+                uploaded_files.append(file)
     highest_date = get_highest_date(files_dict)
     update_env(highest_date)
-
-    if upload_files:
-        repo.index.add(upload_files)  # add
-        repo.index.commit("Resourcepack update")  # commit
-        origin.push()  # push
-    else:
-        print("No files were uploaded")
+    print("updated env")
+    print(uploaded_files)
+    if uploaded_files:
+        repo.index.add(uploaded_files)
+        repo.index.commit("Resourcepack update")
+        print("pushing")
+        result = subprocess.run(
+            ["git", "push", remote_url],
+            cwd=git_path,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        print(f"stdout: {result.stdout}")
+        print(f"stderr: {result.stderr}")
+        print(f"returncode: {result.returncode}")
 
 
 if __name__ == "__main__":
