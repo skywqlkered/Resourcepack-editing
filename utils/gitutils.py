@@ -6,9 +6,11 @@ import datetime
 import subprocess
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-minecraft_pack_path = os.path.join(base_dir, "..", "pack/ethis_resourcepack")
+minecraft_pack_path = os.path.join(base_dir, "../","../", "server-resource-pack/ethis_resourcepack")
 git_path = os.path.join(base_dir, "..", )
 env_path = os.path.join(base_dir, "..", "..", ".env")
+# env_path = os.path.join(base_dir, "..", ".env")
+
 
 def update_env(highest_date: datetime.datetime):
     """Updates the .env file with a new highest date."""
@@ -34,17 +36,6 @@ def setup_remote(repo: git.Repo, github_token: str, github_repo: str) -> git.Rem
     origin.set_url(remote_url)
     return origin
 
-
-def safe_pull(repo: git.Repo, origin: git.Remote):
-    """Discards local changes and pulls from remote cleanly."""
-    # Hard reset staged/tracked changes
-    repo.git.reset("--hard", "HEAD")
-    # Remove untracked files and directories (except the pack folder)
-    repo.git.clean("-fd", "--exclude=pack/")
-    print("reset local changes")
-
-    origin.pull()
-    print("pulled origin")
 
 
 def get_last_update() -> datetime.datetime:
@@ -98,13 +89,9 @@ def upload_files():
     print("tokens loaded")
 
     repo = git.Repo(git_path)
-    if not github_token or not github_repo:
-        raise LookupError("Git tokens not found")
-    origin = setup_remote(repo, github_token, github_repo)
-    safe_pull(repo, origin)
+    origin = setup_remote(repo, github_token, github_repo) #type:ignore
 
     last_update = get_last_update()
-
     changed_files, files_dict = collect_changed_files(since=last_update)
     update_env(get_highest_date(files_dict))
     print("updated env")

@@ -3,7 +3,7 @@ import json
 base_dir = os.path.dirname(os.path.abspath(__file__))  # resolves to .../utils/
 
 
-minecraft_pack_path  = os.path.join(base_dir, "..", "pack/ethis_resourcepack/assets/minecraft/")
+minecraft_pack_path = os.path.join(base_dir, "../","../", "server-resource-pack/ethis_resourcepack")
 
 def create_textures_folder(thread_name: str):
     """_summary_

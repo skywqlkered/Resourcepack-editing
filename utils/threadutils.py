@@ -18,8 +18,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))  # resolves to .../utils/
 
 thread_content_path = os.path.join(base_dir, "..", "threadcontent.json")
 thread_owners_path  = os.path.join(base_dir, "..", "threadowners.json")
-minecraft_pack_path  = os.path.join(base_dir, "..", "pack/ethis_resourcepack/assets/minecraft/")
-
+minecraft_pack_path = os.path.join(base_dir, "../","../", "server-resource-pack/ethis_resourcepack")
 
 async def create_thread(author: discord.User, channel: discord.TextChannel, name):
     thread = await channel.create_thread(name=name, message=None)
